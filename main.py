@@ -9,6 +9,14 @@ from src.train_lstm import (
     train_lstm_model
 )
 from src.risk_scoring import calculate_risk_score
+from src.explainability import explain_model
+from src.visualization import (
+    plot_fraud_distribution,
+    plot_shap_summary,
+    plot_risk_evolution
+)
+from src.intent_drift import detect_intent_drift
+from src.realtime_predictor import predict_realtime_risk
 
 def scale_features(feature_data):
 
@@ -38,7 +46,7 @@ def main():
     print(df.head())
 
     # Train model
-    model = train_model(df)
+    model, X_train = train_model(df)
     # Create sequence data
     # Features for sequence learning
     sequence_features = [
@@ -97,6 +105,41 @@ def main():
 
     print("\nBehavioral Risk Scores:")
     print(risk_scores)
+    # Generate SHAP explanations
+    shap_values = explain_model(
+        model,
+        X_train[:100]
+    )
+
+    print("\nSHAP Explainability Generated")
+    # Visualize fraud distribution
+    plot_fraud_distribution(df)
+    # SHAP feature importance visualization
+    plot_shap_summary(
+        shap_values,
+        X_train[:100]
+    )
+    # Detect behavioral intent drift
+    drift_scores = detect_intent_drift(
+        risk_scores
+    )
+
+    print("\nIntent Drift Scores:")
+    print(drift_scores)
+    # Visualize behavioral risk evolution
+    plot_risk_evolution(
+        risk_scores
+    )
+    # Real-time fraud prediction
+    sample_sequence = X_seq[0]
+
+    realtime_risk = predict_realtime_risk(
+        lstm_model,
+        sample_sequence
+    )
+
+    print("\nReal-Time Fraud Risk:")
+    print(realtime_risk)
 
 if __name__ == "__main__":
     main()

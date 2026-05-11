@@ -57,4 +57,4 @@ def train_model(df):
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_test, predictions))
 
-    return model
+    return model, X_train
